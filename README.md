@@ -157,7 +157,7 @@ GxE interaction analysis performed separately in SPSS Statistics
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/QPM-GWAS.git
+git clone https://github.com/Rainy-Singla/QPM-GWAS.git
 cd QPM-GWAS
 ```
 
