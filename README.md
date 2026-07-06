@@ -75,7 +75,7 @@ QPM-GWAS/
 │
 ├── scripts/
 │   ├── 00_phenotypic_analysis.R   # ✅ Available — full phenotypic pipeline
-│   ├── 01_QC.R                    # 🔄 In progress
+│   ├── 01_QC.R                    # ✅ Available — full QC pipeline
 │   ├── 02_imputation.sh           # 🔄 In progress
 │   ├── 03_GWAS.R                  # 🔄 In progress
 │   ├── 04_visualization.R         # 🔄 In progress
