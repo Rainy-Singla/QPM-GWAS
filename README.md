@@ -41,8 +41,8 @@ Raw Phenotypic Data
         │
         ▼
 01_QC.R
-   SNP filtering: MAF (5%) · Heterozygosity (20%) · Missingness (20%)
-   Tools: TASSEL · PLINK
+   SNP filtering: MAF (5%) · Missingness (20%) · Heterozygosity (20%, TASSEL)
+   Tools: PLINK · TASSEL
         │
         ▼
 02_imputation.sh
@@ -51,12 +51,13 @@ Raw Phenotypic Data
         │
         ▼
 03_GWAS.R
-   Association mapping: FarmCPU · MLM
+   LD decay · Marker density · Association mapping
+   Models: FarmCPU · MLM · BLINK · CMLM · Super
    Package: GAPIT3 (R)
         │
         ▼
 04_visualization.R
-   Manhattan plots · QQ plots · LD decay curves
+   Manhattan plot · Venn diagram
         │
         ▼
 05_candidate_genes.R
@@ -75,7 +76,7 @@ QPM-GWAS/
 │
 ├── scripts/
 │   ├── 00_phenotypic_analysis.R   # ✅ Available — full phenotypic pipeline
-│   ├── 01_QC.R                    # ✅ Available — full QC pipeline
+│   ├── 01_QC.R                    # ✅ Available — SNP quality control
 │   ├── 02_imputation.sh           # 🔄 In progress
 │   ├── 03_GWAS.R                  # 🔄 In progress
 │   ├── 04_visualization.R         # 🔄 In progress
@@ -93,9 +94,9 @@ QPM-GWAS/
 
 ---
 
-## Script 00 — Phenotypic Analysis
+## Scripts
 
-### What it does
+### 00 — Phenotypic Analysis
 
 A generalised, reusable pipeline for phenotypic analysis of multi-trait data from plant breeding trials conducted in a **resolvable incomplete block (lattice) design**. Although developed for QPM, the script works with any crop and any set of traits with minimal configuration.
 
@@ -112,17 +113,15 @@ A generalised, reusable pipeline for phenotypic analysis of multi-trait data fro
 | 9 | Normality testing, Box-Cox transformation, BLUE estimation |
 | 10 | Pearson correlation — corrplot and ggpairs panel |
 
-### Experimental design
-
+**Experimental design:**
 ```
 149 QPM inbred lines  ×  2 replications  ×  multiple environments
 Resolvable incomplete block (lattice) design
 Model: trait ~ Genotype + Replication + Replication:Block
-
 GxE interaction analysis performed separately in SPSS Statistics
 ```
 
-### Traits analysed
+**Traits analysed:**
 
 | Code | Trait | Unit |
 |------|-------|------|
@@ -135,20 +134,43 @@ GxE interaction analysis performed separately in SPSS Statistics
 | RN | Row Number | count |
 | KNPC | Kernel Number per Cob | count |
 
-### Key outputs
+---
 
-| File | Contents |
-|------|----------|
-| `results/Descriptive_Stats.xlsx` | Summary statistics and CV table |
-| `results/ANOVA_CD.xlsx` | ANOVA table and Critical Difference values |
-| `results/Genetic_Variability.xlsx` | GV, PV, h², GA, GA% per trait |
-| `results/BLUEs_Normality.xlsx` | BLUEs for GWAS input + normality check |
-| `results/Correlation.xlsx` | Pearson correlation matrix and p-values |
-| `figures/Boxplot_<trait>.png` | Compact scattered boxplot per trait |
-| `figures/FreqDist_<trait>.png` | Frequency distribution per trait |
-| `figures/Genetic_Variability.png` | h² and GA% bar plots |
-| `figures/Correlation_corrplot.png` | Upper-triangle correlation heatmap |
-| `figures/Correlation_ggpairs.tiff` | Full pairwise correlation panel |
+### 01 — SNP Quality Control
+
+Performs QC filtering of GBS-derived SNP data using PLINK. Heterozygosity filtering (20%) was performed upstream in TASSEL prior to running this script.
+
+| Step | Filter | Threshold |
+|------|--------|-----------|
+| 1 | Heterozygosity (TASSEL) | ≤ 20% per SNP |
+| 2 | Minor Allele Frequency | ≥ 5% |
+| 3 | SNP missingness | ≤ 20% |
+
+**Prerequisites:** PLINK v1.9 — [download here](https://www.cog-genomics.org/plink/)
+
+---
+
+### 02 — Imputation *(in progress)*
+
+Missing genotype imputation using Beagle v5.5.
+
+---
+
+### 03 — GWAS *(in progress)*
+
+LD decay estimation, chromosome marker density, and association mapping via GAPIT3 (FarmCPU, MLM, BLINK, CMLM, Super).
+
+---
+
+### 04 — Visualisation *(in progress)*
+
+Manhattan plot and Venn diagram of significant SNPs across models.
+
+---
+
+### 05 — Candidate Gene Annotation *(in progress)*
+
+LD interval extraction and functional annotation via Ensembl Plants, MaizeGDB, STRING, InterPro, and DAVID.
 
 ---
 
@@ -169,26 +191,20 @@ Format your input file as one row per plot with columns for:
 - Incomplete block
 - Numeric trait values
 
-Both `.xlsx` and `.csv` formats are supported.
+Both `.xlsx` and `.csv` formats are supported for phenotypic analysis.
 
 ### 3. Configure Section 0
 
-Open `scripts/00_phenotypic_analysis.R` and edit only the **USER CONFIGURATION** block at the top:
+Each script has a **USER CONFIGURATION** block at the top — edit only this section to point to your files and set your parameters. No other changes are needed.
 
-```r
-INPUT_FILE      <- "data/your_data.xlsx"   # path to your file
-SHEET           <- 1                        # Excel sheet number (ignored for CSV)
-COL_GENOTYPE    <- "Genotype"              # your genotype column name
-COL_REPLICATION <- "Rep"                   # your replication column name
-COL_BLOCK       <- "Block"                 # your block column name
-TRAITS_MANUAL   <- NULL                    # NULL = auto-detect traits
-N_REPS          <- 2                       # number of replications
-```
-
-### 4. Run the script
+### 4. Run scripts in order
 
 ```r
 source("scripts/00_phenotypic_analysis.R")
+source("scripts/01_QC.R")
+# bash scripts/02_imputation.sh
+source("scripts/03_GWAS.R")
+source("scripts/04_visualization.R")
 ```
 
 All outputs are written automatically to `results/` and `figures/`.
@@ -198,22 +214,11 @@ All outputs are written automatically to `results/` and `figures/`.
 ## Requirements
 
 - **R** >= 4.3.3
-- The script installs all required packages automatically on first run.
+- **PLINK** v1.9 (for `01_QC.R`)
+- **Java** >= 8 and **Beagle** v5.5 JAR (for `02_imputation.sh`)
+- **TASSEL** >= 5.0 (for heterozygosity filtering)
 
-Key packages: `lme4`, `emmeans`, `MASS`, `ggplot2`, `GGally`, `corrplot`,
-`cowplot`, `Hmisc`, `openxlsx`, `readxl`, `moments`, `psych`
-
----
-
-## Data Availability
-
-Raw phenotypic and genotypic data are available upon reasonable request to
-the corresponding author:
-
-**Dr. Priti Sharma**  
-Assistant Professor, School of Agricultural Biotechnology  
-Punjab Agricultural University, Ludhiana, India  
-📧 pritisharma@pau.edu
+All R packages are installed automatically on first run.
 
 ---
 
@@ -227,6 +232,18 @@ Punjab Agricultural University, Ludhiana, India
 | Pleiotropic loci | 9 |
 | PVE range | 5.64 – 27.99% |
 | Novel genomic bins | Chr 3 (3.03–3.04) and Chr 5 (5.01) |
+
+---
+
+## Data Availability
+
+Raw phenotypic and genotypic data are available upon reasonable request to
+the corresponding author:
+
+**Dr. Priti Sharma**  
+Assistant Professor, School of Agricultural Biotechnology  
+Punjab Agricultural University, Ludhiana, India  
+📧 pritisharma@pau.edu
 
 ---
 
