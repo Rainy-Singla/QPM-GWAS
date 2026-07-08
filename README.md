@@ -77,7 +77,7 @@ QPM-GWAS/
 ├── scripts/
 │   ├── 00_phenotypic_analysis.R   # ✅ Available — full phenotypic pipeline
 │   ├── 01_QC.R                    # ✅ Available — SNP quality control
-│   ├── 02_imputation.sh           # 🔄 In progress
+│   ├── 02_imputation.sh           # ✅ Available — Beagle v5.5 imputation
 │   ├── 03_GWAS.R                  # 🔄 In progress
 │   ├── 04_visualization.R         # 🔄 In progress
 │   └── 05_candidate_genes.R       # 🔄 In progress
@@ -150,9 +150,18 @@ Performs QC filtering of GBS-derived SNP data using PLINK. Heterozygosity filter
 
 ---
 
-### 02 — Imputation *(in progress)*
+### 02 — Imputation
 
 Missing genotype imputation using Beagle v5.5.
+
+| Parameter | Value |
+|-----------|-------|
+| Tool | Beagle v5.5 |
+| Memory allocation | 8GB (-Xmx8g) |
+| Input | QC-filtered VCF from 01_QC.R |
+| Output | Imputed VCF (.vcf.gz), decompressed .vcf |
+
+**Prerequisites:** Java >= 8 and Beagle v5.5 JAR — [download here](https://faculty.washington.edu/browning/beagle/beagle.html)
 
 ---
 
