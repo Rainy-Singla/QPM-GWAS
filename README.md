@@ -68,7 +68,7 @@ Raw Phenotypic Data
 ---
 
 ## Repository Structure
-
+ 
 ```
 QPM-GWAS/
 │
@@ -78,7 +78,7 @@ QPM-GWAS/
 │   ├── 00_phenotypic_analysis.R   # ✅ Available — full phenotypic pipeline
 │   ├── 01_QC.R                    # ✅ Available — SNP quality control
 │   ├── 02_imputation.sh           # ✅ Available — Beagle v5.5 imputation
-│   ├── 03_GWAS.R                  # 🔄 In progress
+│   ├── 03_GWAS.R                  # ✅ Available — LD decay, marker density, GAPIT3 GWAS
 │   ├── 04_visualization.R         # 🔄 In progress
 │   └── 05_candidate_genes.R       # 🔄 In progress
 │
@@ -91,9 +91,9 @@ QPM-GWAS/
 └── results/
     └── README.md                  # Description of output files
 ```
-
+ 
 ---
-
+ 
 ## Scripts
 
 ### 00 — Phenotypic Analysis
@@ -165,12 +165,23 @@ Missing genotype imputation using Beagle v5.5.
 
 ---
 
-### 03 — GWAS *(in progress)*
-
-LD decay estimation, chromosome marker density, and association mapping via GAPIT3 (FarmCPU, MLM, BLINK, CMLM, Super).
-
+### 03 — GWAS
+ 
+LD decay estimation, chromosome marker density plot, and association mapping via GAPIT3.
+ 
+| Section | Analysis |
+|---------|----------|
+| 1 | LD decay curve — Hill-Weir model fitted via NLS (Remington et al., 2001) |
+| 2 | Chromosome marker density plot (CMplot, 1 Mb bins) |
+| 3 | GWAS — FarmCPU, MLM, BLINK, CMLM, Super via GAPIT3 |
+| 4 | Significant SNP filtering across models at -log10(p) threshold |
+ 
+**NOTE — Model selection:** All five models run by default. Edit `GWAS_MODELS` in Section 0 to run specific models only. For stable MTA identification, SNPs consistently detected by FarmCPU and MLM are recommended as a conservative approach.
+ 
+**Prerequisites:** GAPIT3 installed from GitHub — `devtools::install_github("jiabowang/GAPIT3")`
+ 
 ---
-
+ 
 ### 04 — Visualisation *(in progress)*
 
 Manhattan plot and Venn diagram of significant SNPs across models.
