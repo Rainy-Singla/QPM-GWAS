@@ -79,7 +79,7 @@ QPM-GWAS/
 │   ├── 01_QC.R                    # ✅ Available — SNP quality control
 │   ├── 02_imputation.sh           # ✅ Available — Beagle v5.5 imputation
 │   ├── 03_GWAS.R                  # ✅ Available — LD decay, marker density, GAPIT3 GWAS
-│   ├── 04_visualization.R         # 🔄 In progress
+│   ├── 04_visualization.R         # ✅ Available — Manhattan plot, Venn diagram
 │   └── 05_candidate_genes.R       # 🔄 In progress
 │
 ├── data/
@@ -182,12 +182,19 @@ LD decay estimation, chromosome marker density plot, and association mapping via
  
 ---
  
-### 04 — Visualisation *(in progress)*
-
-Manhattan plot and Venn diagram of significant SNPs across models.
-
+### 04 — Visualisation
+ 
+Manhattan plot and Venn diagram of significant SNPs across GWAS models.
+ 
+| Section | Analysis |
+|---------|----------|
+| 1 | Manhattan plot — genome-wide p-value distribution with significant SNPs highlighted (CMplot) |
+| 2 | Venn diagram — overlap of significant SNPs across models (ggvenn) |
+ 
+**NOTE:** An UpSet plot alternative (UpSetR) is included as commented code for datasets with more than four models or complex overlaps.
+ 
 ---
-
+ 
 ### 05 — Candidate Gene Annotation *(in progress)*
 
 LD interval extraction and functional annotation via Ensembl Plants, MaizeGDB, STRING, InterPro, and DAVID.
